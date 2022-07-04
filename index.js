@@ -55,8 +55,19 @@ setInterval(() => {
     if (!fs.existsSync(path.resolve("") + `/CSV`)) {
         fs.mkdirSync(path.resolve("") + `/CSV`)
     }
+    if (!fs.existsSync(path.resolve("") + `/config.json`)) {
+        fs.writeFileSync(path.resolve("") + `/config.json`, JSON.stringify({
+            "RemoveNoise": {
+                "use": false,
+                "max": 2.563333333,
+                "min": -2.09,
+                "pga": 0
+            }
+        }, null, "\t"))
+    }
     let list = fs.readdirSync(path.resolve("") + `/DataToCSV`)
     if (list.length != 0) {
+        let Json = JSON.parse(fs.readFileSync(path.resolve("") + `/config.json`).toString())
         let List = fs.readdirSync(path.resolve("") + `/CSV`)
         for (let index = 0; index < list.length; index++) {
             if (List.includes(list[index])) continue
@@ -67,7 +78,25 @@ setInterval(() => {
                 if (Data[Index] == "") continue
                 let DATA = Data[Index].split(" | ")
                 let XYZ = DATA[1].split(": ")
-                data += `${DATA[0]},${XYZ[1].replace(" Y", "")},${XYZ[2].replace(" Z", "")},${XYZ[3]},${DATA[2].replace("PGA: ", "")}\n`
+                let X = Number(XYZ[1].replace(" Y", ""))
+                let Y = Number(XYZ[2].replace(" Z", ""))
+                let Z = Number(XYZ[3])
+                let PGA = Number(DATA[2].replace("PGA: ", ""))
+                if (Json.RemoveNoise.use) {
+                    if (Json.RemoveNoise.max > X > Json.RemoveNoise.min) {
+                        X = 0
+                    }
+                    if (Json.RemoveNoise.max > Y > Json.RemoveNoise.min) {
+                        Y = 0
+                    }
+                    if (Json.RemoveNoise.max > Z > Json.RemoveNoise.min) {
+                        Z = 0
+                    }
+                    if (Json.RemoveNoise.pga > PGA) {
+                        PGA = 0
+                    }
+                }
+                data += `${DATA[0]},${X},${Y},${Z},${PGA}\n`
             }
             fs.writeFileSync(path.resolve("") + `/CSV/${List.length + 1}-${list[index].replace("log", "csv")}`, data)
             fs.unlinkSync(path.resolve("") + `/DataToCSV/${list[index]}`)
