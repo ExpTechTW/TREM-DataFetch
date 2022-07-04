@@ -35,7 +35,7 @@ setInterval(() => {
                         fs.writeFileSync(path.resolve("") + `/Fetch/${D.getFullYear()}/${D.getMonth() + 1}/${D.getDate()}/${D.getHours()}/${Object.keys(Data)[index]}.log`, "")
                     }
                     let log = fs.readFileSync(path.resolve("") + `/Fetch/${D.getFullYear()}/${D.getMonth() + 1}/${D.getDate()}/${D.getHours()}/${Object.keys(Data)[index]}.log`)
-                    let now = new Date(data.Time * 1000)
+                    let now = new Date(data.Time)
                     let Now = now.getFullYear() +
                         "/" + (now.getMonth() + 1) +
                         "/" + now.getDate() +
