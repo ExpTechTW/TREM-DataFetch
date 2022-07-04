@@ -69,7 +69,8 @@ setInterval(() => {
                 let XYZ = DATA[1].split(": ")
                 data += `${DATA[0]},${XYZ[1].replace(" Y", "")},${XYZ[2].replace(" Z", "")},${XYZ[3]},${DATA[2].replace("PGA: ", "")}\n`
             }
-            fs.writeFileSync(path.resolve("") + `/CSV/${list[index].replace("log", "csv")}`, data)
+            fs.writeFileSync(path.resolve("") + `/CSV/${List.length + 1}-${list[index].replace("log", "csv")}`, data)
+            fs.unlinkSync(path.resolve("") + `/DataToCSV/${list[index]}`)
         }
     }
 }, 1000)
