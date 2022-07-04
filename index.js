@@ -49,4 +49,27 @@ setInterval(() => {
         }).catch(function (error) {
             console.log(error);
         })
+    if (!fs.existsSync(path.resolve("") + `/DataToCSV`)) {
+        fs.mkdirSync(path.resolve("") + `/DataToCSV`)
+    }
+    if (!fs.existsSync(path.resolve("") + `/CSV`)) {
+        fs.mkdirSync(path.resolve("") + `/CSV`)
+    }
+    let list = fs.readdirSync(path.resolve("") + `/DataToCSV`)
+    if (list.length != 0) {
+        let List = fs.readdirSync(path.resolve("") + `/CSV`)
+        for (let index = 0; index < list.length; index++) {
+            if (List.includes(list[index])) continue
+            let data = `測量時間,X,Y,Z,PGA\n`
+            let Data = fs.readFileSync(path.resolve("") + `/DataToCSV/${list[index]}`).toString()
+            Data = Data.split("\n")
+            for (let Index = Data.length - 1; Index >= 0; Index--) {
+                if (Data[Index] == "") continue
+                let DATA = Data[Index].split(" | ")
+                let XYZ = DATA[1].split(": ")
+                data += `${DATA[0]},${XYZ[1].replace(" Y", "")},${XYZ[2].replace(" Z", "")},${XYZ[3]},${DATA[2].replace("PGA: ", "")}\n`
+            }
+            fs.writeFileSync(path.resolve("") + `/CSV/${list[index].replace("log", "csv")}`, data)
+        }
+    }
 }, 1000)
